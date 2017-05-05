@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="map-icons-master/dist/css/map-icons.css">
+    <style type="text/css">
+      html, body { height: 100%; margin: 0; padding: 0; }
+      #map { height: 100%; }
+.map-icon-label .map-icon {
+    font-size: 16.8px;
+    color: #FFFFFF;
+    line-height: 33.6px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.map-icon-label .map-icon.map-icon-parking, .map-icon-label .map-icon.map-icon-restaurant {
+  font-size: 14px;
+}
+    </style>
+    <script src="//kendo.cdn.telerik.com/2016.3.1118/js/jquery.min.js"></script>
+  </head>
+  <body>
+    <div id="map" style="width: 100%; height: 100%"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBM-xQ8NawHwMdXgrbJM0bKQhJgDAKTgnc&amp;libraries=places"></script>
+      <script src="map-icons-master/dist/js/map-icons.js"></script>
+    <script>
+      google.maps.event.addDomListener(window, 'load', function() {
+        var ctr = new google.maps.LatLng(40.7829, -73.9654);
+
+        var map = new google.maps.Map(
+          document.getElementById('map'), { center: ctr, zoom: 14 });
+
+        var infowindow = new google.maps.InfoWindow();
+
+        // Specify location, radius and place types for your Places API search.
+        var request = {
+          radius: '1000', location: ctr,
+           types: [ 'museum', 'park' ]
+        };
+
+        // Create the PlaceService and send the request.
+        // Handle the callback with an anonymous function.
+        var service = new google.maps.places.PlacesService(map);
+
+        service.nearbySearch(request, function(results, status) {
+          if (status == google.maps.places.PlacesServiceStatus.OK) {
+            var markers = [];
+
+            for (var i = 0; i < results.length; i ++) {
+              $.ajax({
+                url : '//en.wikipedia.org/w/api.php',
+                data: {
+                  action: 'opensearch',
+                  format: 'json',
+                  search: results[i].name, formatversion: 2, namespace: 0, limit: 1
+                },
+                dataType: 'jsonp',
+                success : function(x) {
+                  if (x.length < 2 || !x[1] || !x[1].length || x[1][0].indexOf(this.name) < 0) {
+                    console.log('Filtered out using Wikipedia: ' + this.name);
+                  } else {
+                    var place = this;
+
+                    var marker = new Marker({
+                       map: map,
+                      icon: {
+                          path: SQUARE_PIN,
+                          fillColor: '#00CCBB',
+                          fillOpacity: 1,
+                          strokeColor: '',
+                          strokeWeight: 0,
+                          scale: 0.6
+                      },
+                      map_icon_label:
+                        '<span class="map-icon map-icon-point-of-interest"></span>',
+                      position: place.geometry.location
+                    });
+
+                    google.maps.event.addListener(marker, 'click', function() {
+                      // Remove all markers for Parking and Restaurant
+                      markers.forEach(function(marker) {
+                        marker.setMap(null);
+                      });
+
+                      map.panTo(this.position);
+                      map.setZoom(16);
+
+                      infowindow.setContent(arguments[0].name);
+                      infowindow.open(map, this);
+
+                      service.nearbySearch({
+                        openNow: true,
+                        radius: '200', location: this.position,
+                        types : [ 'parking', 'restaurant' ]
+                      }, function(results, status) {
+                        if (status == google.maps.places.PlacesServiceStatus.OK) {
+                          for (var j = 0; j < results.length; j ++) {
+                              var place = results[j];
+
+                              var marker = new Marker({
+                                map: map, icon: {
+                                  path: MAP_PIN,
+                                  fillColor: place.types.indexOf('parking') < 0 ? 'red' : 'purple',
+                                  fillOpacity: 1,
+                                  strokeColor: '#00CCBB',
+                                  strokeWeight: 0.5,
+                                  scale: 0.7
+                                },
+                                map_icon_label:
+                                  '<span class="map-icon map-icon-' + (place.types.indexOf
+                                    ('parking') < 0 ? 'restaurant' : 'parking') + '" style="margin-top: -3px"></span>',
+                                animation: google.maps.Animation.DROP,
+                                 position: place.geometry.location, title: place.name
+                              });
+
+                              markers.push(marker);
+
+                              google.maps.event.addListener(marker, 'click', function() {
+                                infowindow.setContent(arguments[0].name);
+                                infowindow.open(map, this);
+                              }.bind(marker, place));
+                          }
+                        }
+                      });
+                    }.bind(marker, place));
+                  }
+                }.bind(results[i])
+              });
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

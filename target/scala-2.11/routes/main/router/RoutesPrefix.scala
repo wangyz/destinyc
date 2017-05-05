@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:/Users/vli/Downloads/play-java-starter-example/conf/routes
-// @DATE:Fri May 05 17:24:02 EDT 2017
+// @SOURCE:/Users/vli/Documents/workspace/individual/destinyc/conf/routes
+// @DATE:Fri May 05 18:59:03 EDT 2017
 
 
 package router {

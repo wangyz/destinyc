@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:/Users/vli/Downloads/play-java-starter-example/conf/routes
-// @DATE:Fri May 05 17:24:02 EDT 2017
+// @SOURCE:/Users/vli/Documents/workspace/individual/destinyc/conf/routes
+// @DATE:Fri May 05 18:59:03 EDT 2017
 
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
 import play.core.routing.{ HandlerDef, ReverseRouteContext, queryString, dynamicString }
@@ -29,26 +29,17 @@ package controllers {
   }
 
   // @LINE:6
-  class ReverseHomeController(_prefix: => String) {
+  class ReverseAssets(_prefix: => String) {
     def _defaultPrefix: String = {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
   
     // @LINE:6
-    def index(): Call = {
-      import ReverseRouteContext.empty
+    def at(): Call = {
+      implicit val _rrc = new ReverseRouteContext(Map(("path", "/public"), ("file", "index.html")))
       Call("GET", _prefix)
     }
-  
-  }
-
-  // @LINE:13
-  class ReverseAssets(_prefix: => String) {
-    def _defaultPrefix: String = {
-      if (_prefix.endsWith("/")) "" else "/"
-    }
-
   
     // @LINE:13
     def versioned(file:Asset): Call = {
