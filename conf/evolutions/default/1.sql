@@ -6,7 +6,7 @@ CREATE TABLE User (
 	password varchar(255) NOT NULL,
 	fullname varchar(255) NOT NULL,
 	isAdmin boolean NOT NULL,
-	cratedate date NOT NULL,
+	createdate date NOT NULL,
 	PRIMARY KEY(id)
 );
 
