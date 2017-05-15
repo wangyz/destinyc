@@ -10,3 +10,4 @@ libraryDependencies += javaJdbc
 libraryDependencies += cache
 libraryDependencies += javaWs
 libraryDependencies += evolutions
+libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.36"
